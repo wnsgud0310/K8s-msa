@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    # h2 는 docker 컨테이너명으로서
+    # docker network 를 사용하게 되면, 컨테이너명을 사용해서
+    # 동일 도커 네트워크에 있는 서버를 참조할 수 있게 됨.
+    url: jdbc:h2:tcp://h2:1521/test
+    username: sa
+    password: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: eureka-server
+  profiles:
+    # config-server 의 config 폴더 아래에 있는 설정파일 참조시
+    # gateway-server-local.yaml 파일이 아니라
+    # gateway-server-docker.yaml 파일을 사용하게 됨.
+    active: docker
+  cloud:
+    config:
+      # config-server 는 docker 컨테이너명으로서
+      # docker network 를 사용하게 되면, 컨테이너명을 사용해서
+      # 동일 도커 네트워크에 있는 서버를 참조할 수 있게 됨.
+      uri: http://config-server:8080
+      # bootstrap.yaml 의 uri 로는 접속이 되지 않음.
+      #uri: http://localhost:8080
+    loadbalancer:
+      ribbon:
+        enabled: false

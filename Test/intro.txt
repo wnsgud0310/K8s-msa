@@ -1,0 +1,195 @@
+##############################################################
+1. 데이터베이스 정보를 통합관리하는 yaml 파일로 관리할 수 있도록 해야함.
+##############################################################
+
+datasource-local.yaml
+datasource-docker.yaml
+
+item-service-docker.yaml 가 datasource-docker.yaml 참조
+item-service-local.yaml 가 datasource-local.yaml 참조
+
+##############################################################
+2. Docker image 빌드 및 컨테이너 정상 실행 확인
+##############################################################
+
+- Docker image test 순서
+1. config-server
+   1.1 Dockerfile 생성 및 script 작성.
+
+   1.2 docker image 생성
+
+   1.3 docker image 로 container 실행
+       - 사전작업
+         docker network 를 이용해서 마이크로 서비스용 network 를 생성.
+
+         마이크로 서비스용 network 를 생성 목적은 아래의 두 가지.
+
+         - 목적 1
+         docker network 기반의 end point 로 container 를 실행하면,
+         지정한 container 명을 이요할 수 있으므로,
+         ip 기반의 접속정보를 사용하지 않고, container name 으로
+         접속정보로 활용할 수 있음.
+
+         - 목적 2
+         yaml 파일에서 host, end point 접속 정보를 가독성 높게 작성 및
+         유지보수가 좋아짐.
+
+         docker run --network mas-network -d -p 8080:8080
+         --name config-server config-server-image:1.0
+
+         --name config-server 로 설정한 container 명으로
+         yaml 파일에서 사용하면 가독성과 유지보수성이 높아짐.
+
+2. eureka-server
+
+   2.1 Dockerfile 생성 및 script 작성
+
+       - 기존의 bootstrap.yaml 삭제
+       - bootstrap-docker.yaml 를  bootstrap.yaml 로 저장.
+
+   2.2 bootstrap-docker.yaml 작성
+       목적은 config-server 의 eureka-server-docker.yaml 를 사용하기 위함.
+
+   2.3 eureka-server-docker.yaml 작성
+       config-server > resources > config > eureka-server-docker.yaml
+
+   2.4 docker image 생성.
+       docker build -t eureka-server-image:1.0 .
+
+   2.5 docker image 로 container 실행.
+       docker run --network msa-network -d -p 8761:8761
+       --name eureka-server eureka-server-image:1.0
+
+   2.6 컨테이너가 정상 실행 여부 확인
+       docker logs -f erureka-server
+
+       또는 Docker Desktop 의 container name 을 클릭
+
+   2.7 Host OS 의 브라우저에서 eureka-server 의 대시보드 페이지 접속
+       http://localhost:8761/
+
+
+3. gateway-server
+
+   3.1 Dockerfile 생성 및  script 작성
+
+       - 기존의 bootstrap.yaml 삭제
+       - bootstrap-docker.yaml 를  bootstrap.yaml 로 저장.
+
+   3.2 bootstrap-docker.yaml 작성
+       src > main > resources > bootstrap-docker.yaml
+
+   3.3 gateway-server-docker.yaml 작성
+       config-server > resources > config > gateway-server-docker.yaml
+
+       gateway-server-docker.yaml 의 내용중에서
+       defaultZone 을 작성시, 유레카 서버의 container name 을 사용해서
+       작성. eureka-server 는 실행된 유레카 서버의 container name 임.
+       ( 컨테이너 이름으로 참조하려면, 반드시 동일한 docker network 에
+        속해 있어야 함. )
+           service-url:
+             defaultZone: http://eureka-server:8761/eureka
+
+   3.4 docker image 생성
+       docker build -t gateway-server-image:1.0
+
+   3.5 docker image 로 container 실행
+       docker run --network msa-network -d -p 8070:8070
+       --name gateway-server gateway-server-image:1.0
+
+   3.6 컨테이너 정상 실행 여부 확인
+       docker logs -f erureka-server
+
+       또는 Docker Desktop 의 container name 을 클릭
+
+   3.7 Host OS의 브라우저에서 eureka-server 의 대시보드 페이지 접속
+       gateway-server 가 등록되어 있는지 확인.
+
+       http://localhost:8761
+
+       대시보드 페이지에 gateway-server 가 표시되는지 확인
+
+4. item-service
+
+   4.2 bootstrap-docker.yaml 작성
+       local H2 DB에서 docker container H2 DB 로 변경
+       config-server > resources > config > item-service-docker.yaml
+
+   4.3 item-service-docker.yaml 작성
+       datasource-docker.yaml 를 참조할 수 있도록 설정.
+
+       datasource-docker.yaml 파일의 datasource 설정 부분중에서
+       url: jdbc:h2:tcp://localhost/./test ( local h2 )
+       url: jdbc:h2:tcp://172.19.0.2:1521/test ( docker h2 )
+
+       개선된 IaC 는 H2 컨테이너 명으로 설정.
+       url: jdbc:h2:tcp://H2:1521/test ( docker h2 )
+
+   4.4 docker image 생성
+       docker build -t item-service-image:1.0 .
+
+   4.5 docker imagte 로 container 실행
+       docker run --network msa-network -d -p
+       --name item-serevice item-service-image:1.0
+
+   4.6 컨테이너 정상 실행 여부 확인
+       docker logs -f erureka-server
+
+       또는 Docker Desktop 의 container name 을 클릭
+
+   4.7 Host OS 의 브라우저에서 eureka-server 의 대시보드 페이지 접속
+       http://localhost:8761
+
+       대시보드 페이지에 item-service 가 표시가 되는지 확인.
+
+   4.8 postman 으로 등록이 정상적으로 진행되는지 확인.
+       docker H2 db 에 정상적으로 데이터가 insert 가 되었는지 확인.
+
+       http://localhost:8070/v1/item/add/F
+
+
+
+##############################################################
+3. Docker image 공개( docker hub )
+##############################################################
+
+1. docker hub 에 로그인
+   docker login
+
+2. docker tag 를 docker hub id( diversim90 ) 와 동일하게 생성
+   docker tag item-service-image:1.0 diversim90/item-service-image:1.0
+
+3. docker image push
+   docker push diversim90/item-service-image:1.0
+
+4. docker hub 웹 페이지에서 확인
+
+5. docker desktop 에서 item-service image 삭제 후,
+   item-service image 로 pull.
+   pull 한 item-service image 를 container 로 실행.
+
+6. eureka-server 의 대시보드 페이지에 접속해서 마이크로 서비스의 등록 확인.
+   postman 이용해서 테스트
+
+
+##############################################################
+4. 기타
+##############################################################
+
+Docker 를 활용한 Container 기반의 MSA
+
+1. JWT 활용
+2. 마이크로 서비스간 통신 - Kafaka
+3. Junit 테스트
+4. CI/CD
+5. Docker Registry
+6. 마이크로 서비스 운영 정책( 업그레이드, 부하 분산 )
+7. prometheus, Grafana
+8. 컨테이너 기반 서비스 탄력성
+9. actuator 활용
+10. MSA의 성능 개선
+
+
+
+
+

@@ -1,0 +1,8 @@
+# factorial-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: factorial-config
+  namespace: factorial
+data:
+  laguage: "en"

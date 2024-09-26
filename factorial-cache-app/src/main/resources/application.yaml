@@ -1,0 +1,8 @@
+server:
+  shutdown: graceful
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 50s
+factorial:
+  language: ${APP_LANGUAGE:ko}
+  api-key: ${API_KEY:abcd-1234-5678}

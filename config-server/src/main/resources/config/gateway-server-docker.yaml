@@ -1,0 +1,29 @@
+logging:
+  file:
+    name: logs/gateway.log
+    max-size: 500MB
+    max-history: 10
+  level:
+    root: info
+    org.msa.gatewayserver: debug
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: item-service
+          uri: lb://item-service
+          predicates:
+            - Path=/v1/item/**
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      # eureka-server 는 docker 컨테이너명으로서
+      # docker network 를 사용하게 되면, 컨테이너명을 사용해서
+      # 동일 도커 네트워크에 있는 서버를 참조할 수 있게 됨.
+      defaultZone: http://eureka-server:8761/eureka

@@ -1,0 +1,14 @@
+server:
+  #port: 5000
+  port: 0 # 사용 가능한 port 를 random 하게 설정.
+spring:
+  application:
+    name: item-service
+  profiles:
+    active: local
+  cloud:
+    config:
+      uri: http://localhost:8080
+    loadbalancer:
+      ribbon:
+        enabled: false

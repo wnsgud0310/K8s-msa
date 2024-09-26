@@ -1,0 +1,25 @@
+server:
+  #port: 5000
+  port: 0 # 사용 가능한 port 를 random 하게 설정.
+spring:
+  application:
+    name: item-service
+  profiles:
+    active: docker
+  cloud:
+    config:
+      # 컨테이너 안에서 config-server 을 연결할 때는
+      # 여기서 작성된 config-server 는
+      # 컨테이너명을 의미함.
+
+      # 컨테이너명을 통해서 연결할 수 있는 방법은
+      # msa-network 네트워크를 통해서
+      # 컨테이너가 통신을 할 수 있음.
+
+      # docker network inspect msa-network 로 확인.
+      uri: http://config-server:8080
+    # bootstrap.yaml 의 uri 로는 접속이 되지 않음.
+    #uri: http://localhost:8080
+    loadbalancer:
+      ribbon:
+        enabled: false
