@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: h2-service
+  namespace: msa
+spec:
+  selector:
+    app: h2-app
+  ports:
+    - protocol: TCP
+      name: console
+      port: 81
+    - protocol: TCP
+      name: server
+      port: 1521

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: h2-deploy
+  namespace: msa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: h2-app
+  template:
+    metadata:
+      labels:
+        app: h2-app
+    spec:
+      containers:
+        - name: h2-container
+          image: oscarfonts/h2
+          env:
+            - name: H2_OPTIONS
+              value: "-ifNotExists"
