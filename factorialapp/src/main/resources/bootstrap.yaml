@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: factorial-app
+  profiles:
+    active: docker
+  cloud:
+    config:
+      uri: http://config-service:8080
+      loadbalancer:
+        ribbon:
+          enabled: false

@@ -43,4 +43,17 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+jib {
+	// base image 설정
+	from {
+		image = "openjdk:17"
+	}
+	to {
+		image = "wnsgud0310/msa-eureka"
+		tags = ['latest', '0.1.0']
+	}
+	container {
+		creationTime = "USE_CURRENT_TIMESTAMP"
+	}
+}
 

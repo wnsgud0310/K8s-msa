@@ -15,4 +15,4 @@ spec:
     spec:
       containers:
         - name: config-container
-          image: wnsgud0310/msa-config:0.1.0
+          image: wnsgud0310/msa-config:0.1.4

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.0'
+    id 'org.springframework.boot' version '3.0.4'
     id 'io.spring.dependency-management' version '1.1.4'
     // gradle jib 를 사용해서 application container image 생성.
     // docker hub push 가능.
@@ -20,7 +20,21 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "2022.0.1")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 dependencies {
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -37,8 +51,8 @@ jib {
         image = "openjdk:17"
     }
     to {
-        image = "diversim90/factorial-app-for-k8s"
-        tags = ['latest', '0.0.7']
+        image = "wnsgud0310/factorial-app"
+        tags = ['latest', '0.1.4']
     }
     container {
         creationTime = "USE_CURRENT_TIMESTAMP"

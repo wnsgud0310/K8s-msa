@@ -1,5 +1,6 @@
 server:
   port: 8070
+
 spring:
   application:
     name: gateway-server
@@ -13,7 +14,7 @@ spring:
       # config-server 는 docker 컨테이너명으로서
       # docker network 를 사용하게 되면, 컨테이너명을 사용해서
       # 동일 도커 네트워크에 있는 서버를 참조할 수 있게 됨.
-      uri: http://config-server:8080
+      uri: http://config-service:8080
     # bootstrap.yaml 의 uri 로는 접속이 되지 않음.
     #uri: http://localhost:8080
     loadbalancer:

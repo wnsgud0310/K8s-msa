@@ -1,8 +1,8 @@
 package com.example.factorialcacheapp;
 
-import org.springframework.http.HttpStatusCode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 
@@ -12,7 +12,10 @@ public class FactorialCalculateService {
     /**
      * HTTP clinet
      */
-    private final RestClient factorialClient = RestClient.create();
+//    private final RestClient factorialClient = RestClient.create();
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     public BigDecimal getCalculateResult(int n) {
 
@@ -31,19 +34,21 @@ public class FactorialCalculateService {
          *  K8S Service 객체명(type : Cluster IP)으로 접속이 가능함.
          */
 
-        String result = factorialClient.get()
-                // K8S 의 Service(ClusterIP) 를 이용해서 factorial-app 을 사용.
-                .uri("http://factorial-app-service:8080/factorial?n="+n)
-                // 호출한 결과를 받아옴
-                .retrieve()
-                // request 에 대한 결과에 에러가 발생했다면,
-                .onStatus(HttpStatusCode::isError,
-                            (request, response) -> {
-                                throw new RuntimeException("invalid server response " +
-                                                            response.getStatusText());
-                            })
-                // request  한 결과를 변환해줄 클래스 설정
-                .body(String.class);
+//        String result = factorialClient.get()
+//                // K8S 의 Service(ClusterIP) 를 이용해서 factorial-app 을 사용.
+//                .uri("http://factorial-app-service:8080/factorial?n="+n)
+//                // 호출한 결과를 받아옴
+//                .retrieve()
+//                // request 에 대한 결과에 에러가 발생했다면,
+//                .onStatus(HttpStatusCode::isError,
+//                            (request, response) -> {
+//                                throw new RuntimeException("invalid server response " +
+//                                                            response.getStatusText());
+//                            })
+//                // request  한 결과를 변환해줄 클래스 설정
+//                .body(String.class);
+
+        String result = restTemplate.getForObject("lb://factorial-app/factorial?n="+n, String.class);
 
         return new BigDecimal(result);
     }

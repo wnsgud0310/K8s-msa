@@ -33,4 +33,4 @@ eureka:
       # 컨테이너명을 통해서 연결할 수 있는 방법은
       # msa-network 네트워크를 통해서
       # 컨테이너가 통신을 할 수 있음.
-      defaultZone: http://eureka-server:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka

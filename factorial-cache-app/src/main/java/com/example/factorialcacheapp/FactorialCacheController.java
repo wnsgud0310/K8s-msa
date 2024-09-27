@@ -1,6 +1,5 @@
 package com.example.factorialcacheapp;
 
-import com.fasterxml.jackson.core.exc.InputCoercionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,13 +14,13 @@ public class FactorialCacheController {
     /**
      * K8S ConfigMap 객체에서 설정된 language 환경변수
      */
-    @Value("${APP_LANGUAGE}")
+    @Value("${msa.language}")
     private String language;
 
     /**
      * K8S secret 객체 생성 명령문을 참조
      */
-    @Value("${API_KEY}")
+    @Value("${msa.api-key}")
     private String apiKey;
 
     private FactorialCalculateService calculateService;

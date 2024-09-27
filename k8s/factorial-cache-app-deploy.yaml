@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorial-cache-app-deploy
+  namespace: msa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factorial-cache-app
+  template:
+    metadata:
+      labels:
+        app: factorial-cache-app
+    spec:
+      containers:
+        - name: factorial-cache-app
+          image: wnsgud0310/factorial-cache-app:0.1.7
+          env:
+            # SPRING 프로필 설정
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+
+            # ConfigMap에서 msa.language 값 주입
+            - name: msa.language
+              valueFrom:
+                configMapKeyRef:
+                  name: factorial-config
+                  key: msa.language
+
+
+            - name: msa.api-key
+              valueFrom:
+                secretKeyRef:
+                  name: factorial-secret
+                  key: msa.api-key
