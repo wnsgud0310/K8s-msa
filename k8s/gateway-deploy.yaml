@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: msa
+  name: gateway-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gateway-app
+  template:
+    metadata:
+      labels:
+        app: gateway-app
+    spec:
+      containers:
+        - name: gateway-container
+          image: wnsgud0310/msa-gateway:0.1.0
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+
+
+

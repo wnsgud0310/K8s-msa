@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: msa
+spec:
+  rules:
+    - host: eureka.localhost
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: eureka-service
+                port:
+                  number: 8761
+
+    - host: gateway.localhost  # 두 번째 규칙에 호스트 추가
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8070
